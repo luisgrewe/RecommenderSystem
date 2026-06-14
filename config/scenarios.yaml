@@ -1,0 +1,161 @@
+scenarios:
+  baseline:
+    description: "3000 tourists, mixed weighted interests, default simulation params"
+    help: "Standard comparison run — mixed tourist profiles with common Barcelona interests. Compare all recommender strategies here first."
+    simulation: {}
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: weighted
+        min_tags: 1
+        max_tags: 3
+        weights:
+          architecture: 0.28
+          history: 0.22
+          museum: 0.18
+          religious: 0.12
+          park: 0.08
+          viewpoint: 0.06
+          market: 0.04
+          beach: 0.02
+      crowd_aversion:
+        type: uniform
+        min: 0.2
+        max: 0.4
+      sustainability_sensitivity:
+        type: uniform
+        min: 0.4
+        max: 0.6
+      prefers_outdoor:
+        probability: 0.2
+      travel_with_kids:
+        probability: 0.1
+
+  seminar_religious:
+    description: "Single tourist case study — religious, architecture, history interests"
+    help: "Seminar example — configure 'Your trip' with religious/architecture interests and compare strategies."
+    simulation:
+      num_tourists: 1
+    tourist_profile:
+      mode: fixed
+      tourist_id: case_study_01
+      interest_tags: [religious, architecture, history]
+      max_price_eur: null
+      travel_budget_km: null
+      lat: 41.387
+      lon: 2.173
+      crowd_aversion: 0.3
+      sustainability_sensitivity: 0.5
+      prefers_outdoor: false
+      travel_with_kids: false
+      walking_tolerance: medium
+
+  crowd_averse:
+    description: "Tourists with high crowd aversion (mean 0.85)"
+    help: "Tourists avoid busy places — watch for 'Likely skipped' badges when POIs are crowded."
+    simulation: {}
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: random
+        min_tags: 1
+        max_tags: 3
+      crowd_aversion:
+        type: normal
+        mean: 0.85
+        std: 0.08
+        clip: [0.5, 1.0]
+      sustainability_sensitivity:
+        type: uniform
+        min: 0.4
+        max: 0.6
+
+  budget_backpacker:
+    description: "Budget-conscious tourists with max_price_eur 8"
+    help: "Cheap tickets only — famous paid attractions drop out of the candidate set."
+    simulation:
+      max_price_eur: 8.0
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: random
+        min_tags: 1
+        max_tags: 3
+      max_price_eur: 8.0
+      crowd_aversion:
+        type: uniform
+        min: 0.3
+        max: 0.5
+
+  family_with_kids:
+    description: "Families — 60% prefer outdoor, shorter travel radius"
+    help: "Outdoor bias and shorter trips — parks and beaches rank higher."
+    simulation:
+      travel_budget_km: 5.0
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: weighted_outdoor
+        outdoor_tags: [park, beach, nature, sport]
+        outdoor_weight: 0.6
+        min_tags: 1
+        max_tags: 3
+      prefers_outdoor:
+        probability: 0.6
+      travel_with_kids:
+        probability: 0.6
+      travel_budget_km_multiplier:
+        min: 0.5
+        max: 0.8
+      crowd_aversion:
+        type: uniform
+        min: 0.4
+        max: 0.6
+
+  overtourism_peak:
+    description: "8000 tourists over 7 days with elevated initial crowding and shared tourist interests"
+    help: "Worst-case overtourism — pair with Popularity to see red hotspots, then Sustainability to show improvement."
+    simulation:
+      num_tourists: 8000
+      num_days: 7
+    crowding:
+      initial_load_boost: 0.35
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: weighted
+        min_tags: 1
+        max_tags: 3
+        weights:
+          architecture: 0.28
+          history: 0.22
+          museum: 0.18
+          religious: 0.12
+          park: 0.08
+          viewpoint: 0.06
+          market: 0.04
+          beach: 0.02
+      crowd_aversion:
+        type: uniform
+        min: 0.2
+        max: 0.4
+
+  sustainability_mission:
+    description: "Eco-conscious tourists with high sustainability sensitivity (mean 0.9)"
+    help: "Tourists who care deeply about sustainability — maximises the green recommender's effect."
+    simulation: {}
+    tourist_profile:
+      mode: population
+      interest_tags:
+        type: random
+        min_tags: 1
+        max_tags: 3
+      sustainability_sensitivity:
+        type: normal
+        mean: 0.9
+        std: 0.05
+        clip: [0.7, 1.0]
+      crowd_aversion:
+        type: uniform
+        min: 0.5
+        max: 0.7

@@ -1,0 +1,27 @@
+# Seminar POIs missing or underrepresented in the Open Data BCN PICS export.
+pois:
+  - poi_id: manual_tibidabo_sagrat_cor
+    name: Temple Expiatori del Sagrat Cor (Tibidabo)
+    lat: 41.422079
+    lon: 2.118667
+    district: Sarrià-Sant Gervasi
+    neighborhood: Sant Gervasi - la Bonanova
+    price_eur: 5.0
+    interest_tags: [religious, viewpoint]
+    popularity_score: 0.82
+    baseline_tourism_intensity: 0.35
+    capacity: 400
+    outstanding: true
+
+  - poi_id: manual_mhc
+    name: Museu d'Història de Catalunya
+    lat: 41.380896
+    lon: 2.185556
+    district: Ciutat Vella
+    neighborhood: la Barceloneta
+    price_eur: 6.0
+    interest_tags: [museum, history]
+    popularity_score: 0.80
+    baseline_tourism_intensity: 0.55
+    capacity: 600
+    outstanding: true

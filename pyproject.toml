@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sustainable-tourism-abm"
+version = "0.1.0"
+description = "Agent-based evaluation of sustainability-aware POI recommenders in Barcelona"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+    "geopandas>=0.14",
+    "shapely>=2.0",
+    "mesa>=3.0",
+    "networkx>=3.0",
+    "solara>=1.40",
+    "plotly>=5.18",
+    "anywidget>=0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

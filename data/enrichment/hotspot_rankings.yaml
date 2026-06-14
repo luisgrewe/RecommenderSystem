@@ -1,0 +1,33 @@
+# Manual top-15 Barcelona hotspot popularity seeds (simulation assumptions).
+# Matched by name substring against curated POI catalogue.
+hotspots:
+  - name_substring: "Sagrada Família"
+    popularity_score: 1.0
+  - name_substring: "Casa Batlló"
+    popularity_score: 0.98
+  - name_substring: "Park Güell"
+    popularity_score: 0.97
+  - name_substring: "Boqueria"
+    popularity_score: 0.95
+  - name_substring: "Museu Picasso"
+    popularity_score: 0.93
+  - name_substring: "Casa Milà"
+    popularity_score: 0.92
+  - name_substring: "La Pedrera"
+    popularity_score: 0.92
+  - name_substring: "Palau Güell"
+    popularity_score: 0.90
+  - name_substring: "Catedral Basílica"
+    popularity_score: 0.89
+  - name_substring: "Montjuïc"
+    popularity_score: 0.88
+  - name_substring: "Born. Museu d'Història"
+    popularity_score: 0.87
+  - name_substring: "CosmoCaixa"
+    popularity_score: 0.86
+  - name_substring: "Santa Maria del Mar"
+    popularity_score: 0.86
+  - name_substring: "Camp Nou"
+    popularity_score: 0.85
+  - name_substring: "Tibidabo"
+    popularity_score: 0.85

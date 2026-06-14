@@ -1,0 +1,4 @@
+Strategy,Gini ↓,Hotspot share ↓,Visit entropy ↑,Total visits,Profile consistency ↑
+Popularity-based,0.836 ± 0.001,0.042 ± 0.000,2.753 ± 0.005,29772 ± 13,0.125 ± 0.250
+Interest-based,0.515 ± 0.003,0.044 ± 0.001,3.737 ± 0.003,24662 ± 84,0.525 ± 0.411
+Sustainability-aware,0.553 ± 0.003,0.018 ± 0.001,3.664 ± 0.004,27718 ± 60,0.425 ± 0.330

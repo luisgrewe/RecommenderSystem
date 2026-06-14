@@ -1,0 +1,40 @@
+simulation:
+  num_tourists: 3000
+  num_days: 5
+  random_seed: 42
+  daily_pois_per_tourist: 2
+  travel_budget_km: 8.0
+  max_price_eur: 35.0
+
+crowding:
+  soft_threshold: 0.6
+  capacity_default: 500
+  decay_rate: 0.15
+  accept_steepness: 4.0
+
+recommenders:
+  strategies:
+    - popularity
+    - interest_based
+    - sustainability
+  top_k: 5
+
+batch:
+  seeds: [42, 7, 99, 123]
+
+sustainability_weights:
+  interest: 0.30
+  environment: 0.25
+  culture: 0.20
+  economy: 0.15
+  crowding_dispersion: 0.10
+
+paths:
+  raw_pics_csv: data/raw/opendatabcn_pics-csv.csv
+  intensity_gpkg: data/raw/intensitat-activitat-turistica/2019_turisme_allotjament.gpkg
+  hotspot_rankings: data/enrichment/hotspot_rankings.yaml
+  manual_pois: data/enrichment/manual_pois.yaml
+  poi_overrides: data/enrichment/poi_overrides.yaml
+  processed_pois: data/processed/pois_simulation.csv
+  batch_results: data/processed/batch_results.csv
+  report_dir: report

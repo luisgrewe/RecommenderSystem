@@ -1,0 +1,10 @@
+# Optional per-POI overrides (sparse — only where catalogue tags/scores need correction).
+overrides:
+  "Mercat Boqueria":
+    interest_tags: [market, history]
+    price_eur: 0
+    capacity: 800
+  "Park Güell":
+    capacity: 700
+  "Temple Expiatori de la Sagrada Família":
+    capacity: 900
