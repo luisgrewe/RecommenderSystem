@@ -168,37 +168,7 @@ def _recommendation_context():
     )
 
 
-def _run() -> None:
-    model_state.set(
-        _make_model(
-            scenario_name=scenario_state.value,
-            strategy_name=_current_strategy_id(),
-            num_tourists=num_tourists_state.value,
-            num_days=num_days_state.value,
-        )
-    )
-    step_count.set(0)
-
-
-def _reset() -> None:
-    _run()
-
-
-def _step() -> None:
-    if model_state.value is None:
-        _run()
-    model = model_state.value
-    if simulation_complete(model):
-        return
-    model.step()
-    step_count.set(step_count.value + 1)
-    model_state.set(model)
-
-
-def _run_day() -> None:
-    if model_state.value is None:
-        _run()
-    model = model_state.value
+def _advance_one_day(model: TourismModel) -> None:
     if simulation_complete(model):
         return
     for _ in range(model.daily_pois_per_tourist):
@@ -207,7 +177,30 @@ def _run_day() -> None:
         model.step()
     model.end_of_day()
     step_count.set(step_count.value + model.daily_pois_per_tourist)
+
+
+def _start() -> None:
+    model = _make_model(
+        scenario_name=scenario_state.value,
+        strategy_name=_current_strategy_id(),
+        num_tourists=num_tourists_state.value,
+        num_days=num_days_state.value,
+    )
+    step_count.set(0)
+    _advance_one_day(model)
     model_state.set(model)
+
+
+def _next_day() -> None:
+    model = model_state.value
+    if model is None or simulation_complete(model):
+        return
+    _advance_one_day(model)
+    model_state.set(model)
+
+
+def _reset() -> None:
+    _invalidate_simulation()
 
 
 def _render_rec_item(insight) -> str:
@@ -405,13 +398,12 @@ def Page():
                         step=1,
                     )
                     with solara.Div(classes=["btn-row", "btn-row-primary"]):
-                        solara.Button("▶ Run", on_click=_run, color="primary")
+                        solara.Button("▶ Start", on_click=_start, color="primary")
+                        solara.Button("Next day", on_click=_next_day)
                         solara.Button("↺ Reset", on_click=_reset)
-                        solara.Button("Step", on_click=_step)
-                        solara.Button("Run day", on_click=_run_day)
                     _render_hint(
-                        "Run day advances one day (2 visits per agent) — "
-                        "use it to watch crowding build on the map."
+                        "Start simulates day 1. Next day continues. Reset clears the "
+                        "map back to baseline crowding."
                     )
 
                 with solara.Div(classes=["sidebar section"]):
@@ -528,7 +520,7 @@ def Page():
                             tag="p",
                             unsafe_innerHTML=(
                                 "<strong>Ready to simulate</strong> — choose a scenario and "
-                                "strategy, then click <strong>Run</strong>. "
+                                "strategy, then click <strong>Start</strong>. "
                                 "Changing scenario or strategy resets the map simulation."
                             ),
                         )

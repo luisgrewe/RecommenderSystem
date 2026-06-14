@@ -17,7 +17,7 @@ STRATEGY_HELP: dict[str, dict[str, str]] = {
         "title": "Sustainability-aware",
         "summary": "Multi-criteria scorer: interests + environment + local culture/economy + live crowding dispersion.",
         "behavior": "Steers tourists away from overtourism hotspots toward lesser-known but relevant POIs. Low hotspot share.",
-        "try_with": "baseline vs popularity — compare metrics after several Run day clicks.",
+        "try_with": "baseline vs popularity — compare metrics after several Next day clicks.",
     },
 }
 
@@ -25,7 +25,7 @@ METRICS_HELP: dict[str, str] = {
     "Total visits": "All POI visits counted across every agent since the run started.",
     "Hotspot share": "% of visits to famous crowded sites (Sagrada, Casa Batlló, Park Güell, Boqueria, Picasso). Lower is better for overtourism.",
     "Crowding Gini": "How unequal visits are across POIs (0 = even spread, 1 = very concentrated). Lower means better city-wide distribution.",
-    "Simulation day": "Current day of the simulated trip. Click Run day to advance and watch metrics update.",
+    "Simulation day": "Days completed so far (e.g. 1 / 5 after Start). Click Next day to advance.",
 }
 
 SCENARIO_HELP_EXTRA: dict[str, str] = {

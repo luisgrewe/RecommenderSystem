@@ -107,7 +107,8 @@ def live_metrics(model: TourismModel | None, pois: list[POI]) -> dict[str, str]:
     gini = gini_coefficient(visit_values)
     hotspot = hotspot_visit_pct(model.total_visits, poi_names, HOTSPOT_SUBSTRINGS)
 
-    day_label = f"{min(model.current_day, model.num_days)} / {model.num_days}"
+    days_done = len(model.daily_visit_log)
+    day_label = f"{days_done} / {model.num_days}"
     if simulation_complete(model):
         day_label += " · done"
 

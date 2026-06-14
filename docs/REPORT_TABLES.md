@@ -112,7 +112,7 @@ Use output for a qualitative **Table 5** (top-3 POI names per strategy). The das
 |--------|--------|
 | Architecture | Mermaid diagram in `README.md` |
 | Bar chart (Gini / hotspot %) | `python scripts/plot_batch_results.py --scenario baseline` |
-| Crowding maps | Solara screenshots: Popularity vs Sustainability after several **Run day** clicks |
+| Crowding maps | Solara screenshots: Popularity vs Sustainability after several **Next day** clicks |
 | Demo video | Screen recording of `python -m solara run src/viz/app.py:Page --port 8765` |
 
 ## Changing experiment settings

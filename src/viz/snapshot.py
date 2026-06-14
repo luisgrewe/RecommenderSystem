@@ -46,7 +46,7 @@ def render_crowded_section(rows: list[CrowdedPOI]) -> str:
     if not rows:
         return (
             '<div class="snapshot-empty">'
-            "No crowding data yet — run a simulation step to populate the city."
+            "No crowding data yet — click Start to populate the city."
             "</div>"
         )
     items = "".join(render_crowded_poi_row(i + 1, row) for i, row in enumerate(rows))
@@ -102,8 +102,8 @@ def render_snapshot_placeholder() -> str:
     return (
         '<div class="snapshot-placeholder">'
         '<div class="snapshot-placeholder-icon" aria-hidden="true">🗺️</div>'
-        "<strong>Run the simulation</strong>"
-        "<p>Step through days to see which POIs fill up and how strategy choices "
-        "change where you would be sent.</p>"
+        "<strong>Start the simulation</strong>"
+        "<p>Click Start, then Next day to see which POIs fill up and how strategy "
+        "choices change where you would be sent.</p>"
         "</div>"
     )

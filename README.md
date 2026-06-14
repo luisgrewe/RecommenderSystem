@@ -23,7 +23,7 @@ python scripts/build_data.py
 python -m solara run src/viz/app.py:Page --port 8765
 ```
 
-Open http://127.0.0.1:8765. Run the simulation, advance a few days, and switch between Popularity-based and Sustainability-aware to compare hotspot pressure on the map.
+Open http://127.0.0.1:8765. Click **Start**, advance with **Next day**, and switch between Popularity-based and Sustainability-aware to compare hotspot pressure on the map.
 
 To stop a server left running in the background:
 
