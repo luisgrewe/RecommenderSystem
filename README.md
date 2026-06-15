@@ -1,37 +1,54 @@
 # Sustainable Tourism Recommender — Agent-Based Evaluation
 
-An agent-based model of tourism in Barcelona that compares three POI recommendation strategies under real crowding dynamics. The system uses Open Data BCN for locations and baseline intensity, Mesa for simulation, and a Solara dashboard for interactive exploration.
+This project evaluates POI recommendation strategies for tourism in Barcelona using an agent-based simulation. It compares three recommenders: popularity-based, interest-based, and sustainability-aware.
 
-The central question is distributional: whether a sustainability-aware recommender can spread visits across the city without hard exclusion rules — and how that compares to popularity-based or interest-based alternatives.
+The main question is whether a recommender can reduce concentration around major tourist hotspots while still suggesting places that are relevant to visitors.
+
+The system uses Open Data BCN for cultural POIs and baseline tourism intensity, Mesa for the simulation, and Solara for the interactive dashboard.
 
 ## Overview
 
-Barcelona publishes both cultural points of interest and spatial tourism intensity. This project joins those sources into a simulation of roughly three thousand tourists moving through seventy-two POIs over several days. Each agent receives recommendations, may accept or skip them depending on crowding, and contributes to live load at each site.
+The project builds a simulation environment with 72 Barcelona POIs. In the baseline scenario, around 3000 tourist agents move through the city over several days. Each tourist receives recommendations, decides whether to visit or skip them, and contributes to the simulated crowding level of each POI.
 
-The dashboard separates two views:
+The simulation is used to compare how different recommendation strategies affect:
 
-- **Simulation** — scenario, strategy, and agent population driving map metrics (Gini, hotspot share, visit counts).
-- **Your trip** — a personal profile for recommendation cards and strategy comparison, independent of the simulated crowd.
+* inequality in the distribution of visits;
+* concentration around major hotspots;
+* overall visit dispersion;
+* recommendation relevance to tourist interests.
+
+The dashboard provides two main views:
+
+* **Simulation**: run scenarios, switch recommendation strategies, and inspect crowding and visit metrics.
+* **Your trip**: compare recommendation cards for a personal tourist profile.
 
 ## Quick start
 
 ```bash
 cd RecommenderSystem
-python -m venv .venv && source .venv/bin/activate
+
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+
 pip install -r requirements.txt
 python scripts/build_data.py
+
 python -m solara run src/viz/app.py:Page --port 8765
 ```
 
-Open http://127.0.0.1:8765. Click **Start**, advance with **Next day**, and switch between Popularity-based and Sustainability-aware to compare hotspot pressure on the map.
+Open:
 
-To stop a server left running in the background:
-
-```bash
-lsof -ti :8765 | xargs kill    # use :8766 if you started on that port
+```text
+http://127.0.0.1:8765
 ```
 
-Use `kill -9` if the process does not exit.
+To stop a server running in the background:
+
+```bash
+lsof -ti :8765 | xargs kill
+```
+
+Use `kill -9` only if the process does not stop normally.
 
 ## Architecture
 
@@ -41,15 +58,18 @@ flowchart LR
     POI[Cultural POIs]
     INT[Tourism intensity]
   end
-  subgraph sim [Mesa ABM]
-    AG[Tourist agents]
-    CR[Crowding state]
-  end
+
   subgraph rec [Recommenders]
-    P[Popularity]
+    P[Popularity-based]
     I[Interest-based]
     S[Sustainability-aware]
   end
+
+  subgraph sim [Mesa simulation]
+    AG[Tourist agents]
+    CR[Crowding state]
+  end
+
   POI --> AG
   INT --> CR
   rec --> AG
@@ -58,104 +78,129 @@ flowchart LR
   CR --> VIZ[Dashboard]
 ```
 
-**Data pipeline** — Raw POI records are filtered, tagged, enriched, and joined with baseline intensity. Assumptions and overrides are versioned in `data/enrichment/`. See [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md) for provenance.
+## Main components
 
-**Simulation** — `TourismModel` runs a daily loop: recommend, accept/reject, visit, update crowding, decay. POIs hold state; tourists are Mesa agents.
+### Data pipeline
 
-**Evaluation** — Batch runs compare strategies on Gini coefficient, hotspot visit share, entropy, and profile consistency. The dashboard exposes the same logic interactively.
+The data pipeline filters and enriches Open Data BCN POIs. It adds tags, prices, popularity scores, capacity estimates, and baseline tourism intensity. Manual assumptions and overrides are stored in `data/enrichment/`.
 
-## Recommender strategies
+Data provenance is documented in [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md).
 
-| Strategy | Mechanism |
-|----------|-----------|
-| Popularity-based | Ranks POIs by global fame; budget and distance filters apply. |
-| Interest-based | Cosine similarity on interest tags; distance and crowding penalties. |
-| Sustainability-aware | Multi-criteria score: interests, environment, culture, economy, and live crowding dispersion. |
+### Simulation
 
-Scenario presets in `config/scenarios.yaml` vary population size, crowd sensitivity, budget, and initial load. Examples include `baseline`, `seminar_religious`, `crowd_averse`, `budget_backpacker`, `family_with_kids`, `overtourism_peak`, and `sustainability_mission`.
+The simulation is implemented with Mesa. Each day follows the same logic:
 
-## Setup
+1. recommend POIs;
+2. accept or skip recommendations;
+3. record visits;
+4. update crowding;
+5. apply end-of-day crowding decay.
 
-```bash
-cd RecommenderSystem
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python scripts/build_data.py       # writes data/processed/pois_simulation.csv
-```
+### Recommenders
+
+| Strategy             | Mechanism                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Popularity-based     | Ranks POIs mainly by global popularity.                                                                     |
+| Interest-based       | Matches POIs to tourist interest tags.                                                                      |
+| Sustainability-aware | Combines interest match, tourism pressure, cultural relevance, affordability, and live crowding dispersion. |
+
+## Scenarios
+
+Scenario presets are defined in `config/scenarios.yaml`.
+
+Main scenarios used in the report:
+
+| Scenario            | Purpose                                                                           |
+| ------------------- | --------------------------------------------------------------------------------- |
+| `baseline`          | Standard mixed tourist population.                                                |
+| `overtourism_peak`  | Stress test with more tourists, more days, and higher initial crowding.           |
+| `seminar_religious` | Single-tourist case study for a religious, historical, and architectural profile. |
+
+Additional scenarios are also available for exploration, such as `crowd_averse`, `budget_backpacker`, `family_with_kids`, and `sustainability_mission`.
 
 ## Commands
 
-All commands assume the virtualenv is active.
+All commands assume the virtual environment is active.
 
-| Task | Command |
-|------|---------|
-| Tests | `pytest -q` |
-| Dashboard | `python scripts/launch_viz.py` |
-| Dashboard (direct) | `python -m solara run src/viz/app.py:Page --port 8765` |
-| Case study (no agents) | `python scripts/run_case_study.py --scenario seminar_religious` |
-| Batch simulation | `python scripts/run_batch.py --scenario baseline` |
-| **All scenarios + reports** | `python scripts/run_all_reports.py` |
-| Table 3 summary | `python scripts/summarize_batch_results.py --scenario baseline` |
-| List scenarios | `python scripts/run_scenario.py --list` |
-| Compare all scenarios | `python scripts/run_scenario.py --compare` |
+| Task                      | Command                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| Run tests                 | `pytest -q`                                                     |
+| Build POI data            | `python scripts/build_data.py`                                  |
+| Launch dashboard          | `python scripts/launch_viz.py`                                  |
+| Launch dashboard directly | `python -m solara run src/viz/app.py:Page --port 8765`          |
+| Run batch simulation      | `python scripts/run_batch.py --scenario baseline`               |
+| Summarise batch results   | `python scripts/summarize_batch_results.py --scenario baseline` |
+| Plot batch results        | `python scripts/plot_batch_results.py --scenario baseline`      |
+| Run report scenarios      | `bash run_scenarios_report.sh`                                  |
+| Run case study            | `python scripts/run_case_study.py --scenario seminar_religious` |
+| List scenarios            | `python scripts/run_scenario.py --list`                         |
+| Compare scenarios         | `python scripts/run_scenario.py --compare`                      |
 
-Batch output: `data/processed/batch_results.csv`.
+Batch results are saved in:
 
-## Report tables (reproducibility)
-
-For the written report — especially **Table 3** (strategy comparison on the baseline scenario):
-
-```bash
-# One command: all batch scenarios → batch_results.csv + report/<scenario>/
-python scripts/run_all_reports.py
+```text
+data/processed/batch_results.csv
 ```
 
-Or step by step:
+Scenario-specific tables and figures are saved under:
+
+```text
+report/<scenario>/
+```
+
+## Report reproduction
+
+The written report uses two population scenarios and one single-tourist case study:
+
+* `baseline`
+* `overtourism_peak`
+* `seminar_religious`
+
+To reproduce the results included in the report, run:
 
 ```bash
-# 1. Run 3 strategies × 4 seeds (writes raw metrics)
+chmod +x run_scenarios_report.sh
+./run_scenarios_report.sh
+```
+
+The script runs the exact scenarios used in the report:
+
+```bash
+# Baseline scenario
 python scripts/run_batch.py --scenario baseline
-
-# 2. Table 3 (CSV + terminal markdown)
 python scripts/summarize_batch_results.py --scenario baseline
-
-# 3. Figure — bar chart for the report
 python scripts/plot_batch_results.py --scenario baseline
+
+# Overtourism peak scenario
+python scripts/run_batch.py --scenario overtourism_peak
+python scripts/summarize_batch_results.py --scenario overtourism_peak
+python scripts/plot_batch_results.py --scenario overtourism_peak
+
+# Religious tourist case study
+python scripts/run_case_study.py --scenario seminar_religious
 ```
 
-`run_all_reports.py` runs **6 population scenarios** (excludes `seminar_religious`, which is a single-tourist case study). Use `--reports-only` to rebuild tables/figures from existing `batch_results.csv` without re-simulating.
-
-Outputs in `report/baseline/`:
-
-- `table3.csv` — paste into Word/Excel for Table 3
-- `figure.png` / `figure.pdf` — insert as Figure 3
-
-Full steps: [`docs/REPORT_TABLES.md`](docs/REPORT_TABLES.md).
-
-## Scope and limitations
-
-This is a policy counterfactual model, not a production recommender. There are no real visitor click logs; interest tags and sustainability rubric entries are documented assumptions, partially calibrated from the 2019 intensity layer. POI and intensity data come from different years — the fusion is described in [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md). Results are intended for comparative analysis under stated assumptions, not point forecasting.
+The batch simulations generate the quantitative results used for the baseline and overtourism tables. The case-study script generates the top recommendations for the fixed religious tourist profile.
 
 ## Project layout
 
-```
-data/raw/          # Open Data BCN inputs
-data/processed/    # Generated POI table, batch_results.csv
-data/enrichment/   # YAML assumptions
-report/            # Report tables and figures (table3.csv, figure.png per scenario)
-docs/              # Report reproduction (REPORT_TABLES.md)
-src/               # Pipeline, recommenders, simulation, metrics, viz
-scripts/           # CLI entry points
-tests/
+```text
 config/            # simulation.yaml, scenarios.yaml
+data/raw/          # Open Data BCN inputs
+data/processed/    # generated POI table and batch results
+data/enrichment/   # manual assumptions and overrides
+docs/              # report reproduction notes
+report/            # generated report tables and figures
+scripts/           # command-line entry points
+src/               # data pipeline, recommenders, simulation, metrics, dashboard
+tests/             # unit tests
 ```
 
 ## Data sources
 
-| Dataset | Link |
-|---------|------|
-| Cultural interest points | [Open Data BCN](https://opendata-ajuntament.barcelona.cat/data/en/dataset/punts-informacio-turistica) |
+| Dataset                   | Source                                                                                                    |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Cultural interest points  | [Open Data BCN](https://opendata-ajuntament.barcelona.cat/data/en/dataset/punts-informacio-turistica)     |
 | Tourism intensity by area | [Open Data BCN](https://opendata-ajuntament.barcelona.cat/data/en/dataset/intensitat-activitat-turistica) |
 
-Full citations: [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md)
+Full source notes are available in [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md).
